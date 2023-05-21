@@ -1,6 +1,5 @@
 package com.driver;
 
-import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,8 +8,8 @@ import java.util.List;
 @Service
 public class OrderService {
 
-    OrderRepository orderRepository=new OrderRepository();
-
+    @Autowired
+    OrderRepository orderRepository;
 
     public void addOrder(Order order){
         orderRepository.addOrder(order);
@@ -20,85 +19,59 @@ public class OrderService {
         orderRepository.addPartner(partnerId);
     }
 
-
     public void addOrderPartnerPair(String orderId, String partnerId){
-        orderRepository.addOrderPartnerPair(orderId, partnerId);
+        orderRepository.addOrderPartnerPair(orderId,partnerId);
     }
 
     public Order getOrderById(String orderId){
-        Order order = orderRepository.getOrderById(orderId);
-        return order;
+        return orderRepository.getOrderById(orderId);
     }
 
     public DeliveryPartner getPartnerById(String partnerId){
-        DeliveryPartner partner = orderRepository.getPartnerById(partnerId);
-        return partner;
+        return orderRepository.getPartnerById(partnerId);
     }
 
     public int getOrderCountByPartnerId(String partnerId){
-        int orderCount = orderRepository.getOrderCountByPartnerId(partnerId);
-        return orderCount;
+        return orderRepository.getOrderCountByPartnerId(partnerId);
     }
 
     public List<String> getOrdersByPartnerId(String partnerId){
-        List<String> list = orderRepository.getOrdersByPartnerId(partnerId);
-        return list;
-
+        return orderRepository.getOrdersByPartnerId(partnerId);
     }
 
     public List<String> getAllOrders(){
-        List<String> list = orderRepository.getAllOrders();
-        return list;
+        return orderRepository.getAllOrders();
     }
 
     public int getCountOfUnassignedOrders(){
-        int count = orderRepository.getCountOfUnassignedOrders();
-        return count;
+        return orderRepository.getCountOfUnassignedOrders();
     }
 
-    public int getOrdersLeftAfterGivenTimeByPartnerId(String time, String partnerId){
-//        String s1 = String.valueOf(time.charAt(0) + time.charAt(1));
-//        String s2 = String.valueOf(time.charAt(3) + time.charAt(4));
-//        int hh = Integer.valueOf(s1);
-//        int mm = Integer.valueOf(s2);
+    public int getOrdersLeftAfterGivenTimeByPartnerId(String deliveryTime, String partnerId){
+        String time[] = deliveryTime.split(":");
+        int newTime = Integer.parseInt(time[0])*60 + Integer.parseInt(time[1]);
 
-        String arr[] = time.split(":");
-        int hh = Integer.parseInt(arr[0]);
-        int mm = Integer.parseInt(arr[1]);
-
-        int timeInt = (hh*60)+mm;
-
-        int count = orderRepository.getOrdersLeftAfterGivenTimeByPartnerId(timeInt, partnerId);
-
-        return count;
+        return orderRepository.getOrdersLeftAfterGivenTimeByPartnerId(newTime, partnerId);
     }
 
     public String getLastDeliveryTimeByPartnerId(String partnerId){
+        int time = orderRepository.getLastDeliveryTimeByPartnerId(partnerId);
+        String HH = String.valueOf(time/60);
+        String MM = String.valueOf(time%60);
 
-        int timeInt = orderRepository.getLastDeliveryTimeByPartnerId(partnerId);
-        int hh = timeInt/60;
-        int mm = timeInt%60;
-        String HH = String.valueOf(hh);
-        if(HH.length()==1){
+        if(HH.length()<2)
             HH = '0' + HH;
-        }
-        String MM = String.valueOf(mm);
-        if(MM.length()==1){
-            MM = '0'+MM;
-        }
+        if(MM.length()<2)
+            MM = '0' + MM;
 
-        String time = HH + ":" + MM;
-        return time;
+        return HH+':'+MM;
     }
 
-
     public void deletePartnerById(String partnerId){
-
         orderRepository.deletePartnerById(partnerId);
     }
 
     public void deleteOrderById(String orderId){
-
         orderRepository.deleteOrderById(orderId);
     }
 }
